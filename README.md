@@ -8,18 +8,7 @@ The **CooRTweet** package builds on the existing literature on coordinated behav
 
 # Install
 
-## Development Version 
-
-```r
-# install.packages("devtools")
-
-library("devtools")
-devtools::install_github("https://github.com/nicolarighetti/CooRTweet")
-```
-
 ## Install from CRAN
-
-(coming soon)
 
 ```r
 install.packages("CooRTweet")
@@ -30,6 +19,10 @@ install.packages("CooRTweet")
 The package works with data retrieved from the Twitter Academic API in the JSON format provided by the function *get_all_tweets* of the R package [academictwitteR](https://github.com/cjbarrie/academictwitteR), which retrieves tweets and users' information at once.
 
 For a walk-through see the [vignette](https://github.com/nicolarighetti/CooRTweet/blob/master/vignettes/vignette.md).
+
+## Citation
+
+Righetti N., Balluff P. (2023). CooRTweet: Coordinated Networks Detection on Social Media. R package version 1.4.0. https://CRAN.R-project.org/package=CooRTweet.
 
 
 ## References

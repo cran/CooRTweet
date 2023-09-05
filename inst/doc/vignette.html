@@ -636,7 +636,7 @@ Object.defineProperty(e,"__esModule",{value:!0}),e.mhchemParser=void 0;var r=fun
 <body>
 
 <h1 id="introduction-to-coortweet">Introduction to CooRTweet</h1>
-<p>Nicola Righetti &amp; Paul Balluff 2023-05-24</p>
+<p>Nicola Righetti &amp; Paul Balluff 2023-09-05</p>
 <h1 id="introduction">Introduction</h1>
 <p>We introduce <code>CooRTweet</code> an R-Package for detecting
 coordinated behavior on Twitter. Coordinated behavior has been defined
@@ -735,8 +735,8 @@ parameter combinations</em>.</p>
 <p>We provide an anonymized version of a real dataset of coordinated
 tweets by pro-government users in Russia (Kulichkina, Righetti, and
 Waldherr 2022). You can load the sample dataset as follows:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(CooRTweet)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>russian_coord_tweets</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(CooRTweet)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>russian_coord_tweets</span></code></pre></div>
 <p>The dataset has four columns which is the minimum required input data
 for detecting coordinated behavior:</p>
 <ul>
@@ -750,14 +750,14 @@ was posted by the user.</li>
 </ul>
 <p>The length of <code>content_id</code> should be the same as the
 number of rows of your input data</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(russian_coord_tweets<span class="sc">$</span>content_id) <span class="sc">==</span> <span class="fu">nrow</span>(russian_coord_tweets)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">length</span>(russian_coord_tweets<span class="sc">$</span>content_id) <span class="sc">==</span> <span class="fu">nrow</span>(russian_coord_tweets)</span></code></pre></div>
 <p>Let’s assume that we want to detect coordinated behavior with a
 <code>min_repetition</code> of 5 within a <code>time_window</code> of 10
 seconds. We can call the main function
 <code>detect_coordinated_groups()</code> as follows:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(russian_coord_tweets, </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">min_repetition =</span> <span class="dv">5</span>, </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">time_window =</span> <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(russian_coord_tweets, </span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>                                    <span class="at">min_repetition =</span> <span class="dv">5</span>, </span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>                                    <span class="at">time_window =</span> <span class="dv">10</span>)</span></code></pre></div>
 <p>The <code>result</code> is a <code>data.table</code> that only
 includes the users and their contents that were identified as
 coordinated with the given parameters. The <code>result</code> is in a
@@ -775,7 +775,7 @@ convenience functions <code>group_stats()</code> and
 users share in a coordinated fashion, we can call
 <code>group_stats()</code> and pass in our <code>results</code>
 table:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>summary_groups <span class="ot">&lt;-</span> <span class="fu">group_stats</span>(result)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>summary_groups <span class="ot">&lt;-</span> <span class="fu">group_stats</span>(result)</span></code></pre></div>
 <p><code>summary_groups</code> shows how many coordinated users (column
 <code>users</code>) participated for each unique shared object
 (<code>object_id</code>), how many coordinated posts
@@ -786,7 +786,7 @@ the tweet with the id <code>4a5c13a7f533d6ebc27bec5581ad5a9f</code>
 within an average time delay of 2 seconds.</p>
 <p>If you are interested in understanding more about the users you can
 call <code>user_stats()</code>:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>summary_users <span class="ot">&lt;-</span> <span class="fu">user_stats</span>(result)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>summary_users <span class="ot">&lt;-</span> <span class="fu">user_stats</span>(result)</span></code></pre></div>
 <p><code>summary_users</code> shows that the user with the ID
 <code>dcaec387c76f1d26a0d51f61227fdac0</code> shared a total of 6
 coordinated posts and within an average time window of 4.3 seconds.</p>
@@ -799,19 +799,19 @@ the process.</p>
 directory. You can load the JSON data with the
 <code>load_tweets_json()</code> and
 <code>load_twitter_users_json()</code> functions</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load data</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>raw <span class="ot">&lt;-</span> <span class="fu">load_tweets_json</span>(<span class="st">&#39;path/to/data/with/jsonfiles&#39;</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>users <span class="ot">&lt;-</span> <span class="fu">load_twitter_users_json</span>(<span class="st">&#39;path/to/data/with/jsonfiles&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># load data</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>raw <span class="ot">&lt;-</span> <span class="fu">load_tweets_json</span>(<span class="st">&#39;path/to/data/with/jsonfiles&#39;</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>users <span class="ot">&lt;-</span> <span class="fu">load_twitter_users_json</span>(<span class="st">&#39;path/to/data/with/jsonfiles&#39;</span>)</span></code></pre></div>
 <p><strong>If you cannot load your Twitter data, please feel free to
 raise an issue in our <a href="https://github.com/nicolarighetti/CooRTweet/">Github
 repository</a>. We are happy to help!</strong></p>
 <p>Twitter data is nested and difficult to handle, so we also provide a
 simple pre-processing function that unnests the data:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># preprocess (unnest) data</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>tweets <span class="ot">&lt;-</span> <span class="fu">preprocess_tweets</span>(raw)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>users <span class="ot">&lt;-</span> <span class="fu">preprocess_twitter_users</span>(users)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># preprocess (unnest) data</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>tweets <span class="ot">&lt;-</span> <span class="fu">preprocess_tweets</span>(raw)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>users <span class="ot">&lt;-</span> <span class="fu">preprocess_twitter_users</span>(users)</span></code></pre></div>
 <p>The resulting <code>tweets</code> is a named list, where each item is
 a <code>data.table</code>. The five <code>data.table</code>s are:
 <code>tweets</code>, <code>referenced</code>, <code>urls</code>,
@@ -830,39 +830,39 @@ behavior; <code>hashtags</code>, for coordinated usage of hashtags;
 <code>urls_domain</code> to detect coordinated link sharing behavior at
 the domain level.</p>
 <h3 id="coordination-by-retweets">Coordination by Retweets</h3>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># reshape data</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>retweets <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;retweets&quot;</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># detect coordinated tweets</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(retweets, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_repetition =</span> <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># reshape data</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>retweets <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;retweets&quot;</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co"># detect coordinated tweets</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(retweets, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_repetition =</span> <span class="dv">10</span>)</span></code></pre></div>
 <h3 id="coordination-by-hashtags">Coordination by Hashtags</h3>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>hashtags <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;hashtags&quot;</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(hashtags, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_repetition =</span> <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>hashtags <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;hashtags&quot;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(hashtags, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_repetition =</span> <span class="dv">10</span>)</span></code></pre></div>
 <h3 id="coordination-by-link-sharing">Coordination by Link Sharing</h3>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>urls <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;urls&quot;</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(urls, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_repetition =</span> <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>urls <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;urls&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(urls, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_repetition =</span> <span class="dv">10</span>)</span></code></pre></div>
 <h3 id="coordination-by-link-sharing-considering-only-the-domain">Coordination
 by Link Sharing (considering only the domain)</h3>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>urls <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;urls_domain&quot;</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(urls, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_repetition =</span> <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>urls <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;urls_domain&quot;</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(urls, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_repetition =</span> <span class="dv">10</span>)</span></code></pre></div>
 <h3 id="get-summaries-of-results">Get summaries of results</h3>
 <p>There are two functions that give summaries of the
 <code>result</code> data: <code>group_stats()</code> and
 <code>user_stats()</code>.</p>
 <p>To get insights on the coordinated content (groups), use
 <code>group_stats()</code></p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>summary_groups <span class="ot">&lt;-</span> <span class="fu">group_stats</span>(result)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>summary_groups <span class="ot">&lt;-</span> <span class="fu">group_stats</span>(result)</span></code></pre></div>
 <p>It returns a <code>data.table</code> which shows the group statistics
 for total count of unique users, total posts in per group, and average
 time delta per group. If your group analysis is focused on retweets, you
 can join the data back as follows:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># rename tweet column</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">setnames</span>(summary_groups, <span class="st">&quot;object_id&quot;</span>, <span class="st">&quot;tweet_id&quot;</span>)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>summary_groups <span class="ot">&lt;-</span> tweets<span class="sc">$</span>tweets[summary_groups, on <span class="ot">=</span> <span class="st">&quot;tweet_id&quot;</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co"># rename tweet column</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="fu">setnames</span>(summary_groups, <span class="st">&quot;object_id&quot;</span>, <span class="st">&quot;tweet_id&quot;</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>summary_groups <span class="ot">&lt;-</span> tweets<span class="sc">$</span>tweets[summary_groups, on <span class="ot">=</span> <span class="st">&quot;tweet_id&quot;</span>]</span></code></pre></div>
 <p>If you are interested in the user statistics, you can pass
 <code>result</code> into <code>user_stats()</code></p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>summary_users <span class="ot">&lt;-</span> <span class="fu">user_stats</span>(result)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>summary_users <span class="ot">&lt;-</span> <span class="fu">user_stats</span>(result)</span></code></pre></div>
 <p>It provides summary statistics for each user that participated in
 coordinated behavior: total coordinated posts shared, and average time
 delta. High number of posts shared and low average time delta are
@@ -870,36 +870,36 @@ indicators for highly coordinated (and potentially automated) user
 behavior.</p>
 <p>You can rejoin these summary statistics with the original data as
 follows (using <code>data.table</code> syntax):</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># rename user column</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">setnames</span>(summary_users, <span class="st">&quot;id_user&quot;</span>, <span class="st">&quot;user_id&quot;</span>)</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># join with pre-processed user data</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>summary_users <span class="ot">&lt;-</span> users[summary_users, on <span class="ot">=</span> <span class="st">&quot;user_id&quot;</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co"># rename user column</span></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="fu">setnames</span>(summary_users, <span class="st">&quot;id_user&quot;</span>, <span class="st">&quot;user_id&quot;</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co"># join with pre-processed user data</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>summary_users <span class="ot">&lt;-</span> users[summary_users, on <span class="ot">=</span> <span class="st">&quot;user_id&quot;</span>]</span></code></pre></div>
 <h3 id="generate-a-network">Generate a network</h3>
 <p>We provide a utility function to transform the <code>result</code> to
 an <a href="https://r.igraph.org/"><code>igraph</code></a> object for
 further analysis. In this example, we want to investigate the
 coordinated content, and how they are connected.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>coord_graph <span class="ot">&lt;-</span> <span class="fu">generate_network</span>(result, <span class="at">intent =</span> <span class="st">&quot;objects&quot;</span>)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># E.g., get the degree of each node for filtering</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>degree <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">degree</span>(coord_graph)</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Or we can run a community detection algorithm</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>cluster <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">cluster_louvain</span>(coord_graph)<span class="sc">$</span>membership</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>coord_graph <span class="ot">&lt;-</span> <span class="fu">generate_network</span>(result, <span class="at">intent =</span> <span class="st">&quot;objects&quot;</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="co"># E.g., get the degree of each node for filtering</span></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>degree <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">degree</span>(coord_graph)</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="co"># Or we can run a community detection algorithm</span></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>cluster <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">cluster_louvain</span>(coord_graph)<span class="sc">$</span>membership</span></code></pre></div>
 <p>Then, we can join the graph back to the original
 <code>data.table</code>, with additional information, such as the
 cluster for each content:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>dt <span class="ot">&lt;-</span> <span class="fu">data.table</span>(<span class="at">tweet_id=</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>name,</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">cluster=</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>cluster,</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">degree=</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>degree)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>dt_joined <span class="ot">&lt;-</span> tweets<span class="sc">$</span>tweets[dt, on <span class="ot">=</span> <span class="st">&quot;tweet_id&quot;</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>dt <span class="ot">&lt;-</span> <span class="fu">data.table</span>(<span class="at">tweet_id=</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>name,</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>                <span class="at">cluster=</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>cluster,</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>                <span class="at">degree=</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>degree)</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>dt_joined <span class="ot">&lt;-</span> tweets<span class="sc">$</span>tweets[dt, on <span class="ot">=</span> <span class="st">&quot;tweet_id&quot;</span>]</span></code></pre></div>
 <h1 id="references">References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent">
 
