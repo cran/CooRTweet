@@ -7,6 +7,7 @@ library(CooRTweet)
 
 ## ----results='hide'-----------------------------------------------------------
 library(CooRTweet)
+set.seed(123)
 russian_coord_tweets
 
 ## ----results='hide'-----------------------------------------------------------
@@ -14,17 +15,44 @@ length(russian_coord_tweets$content_id) == nrow(russian_coord_tweets)
 
 
 ## ----results='hide'-----------------------------------------------------------
-result <- detect_coordinated_groups(russian_coord_tweets, 
-                                    min_repetition = 5, 
-                                    time_window = 10)
+result <- detect_groups(russian_coord_tweets,
+                        min_participation = 2,
+                        time_window = 600)
+
+## -----------------------------------------------------------------------------
+coord_graph <- generate_coordinated_network(result, edge_weight = 0.99, objects = TRUE)
 
 ## ----results='hide'-----------------------------------------------------------
-summary_groups <- group_stats(result)
+library(igraph)
 
+min(E(coord_graph)$weight[E(coord_graph)$weight_threshold == 1])
 
 ## ----results='hide'-----------------------------------------------------------
-summary_users <- user_stats(result)
+summary_groups <- group_stats(coord_graph, weight_threshold = "full")
 
+## ----results='hide'-----------------------------------------------------------
+summary_accounts <- account_stats(coord_graph, result, weight_threshold = "full")
+
+## -----------------------------------------------------------------------------
+result_update <- flag_speed_share(russian_coord_tweets, result, min_participation = 2, time_window = 120)
+
+## -----------------------------------------------------------------------------
+coord_graph_fast <-
+  generate_coordinated_network(
+    result_update,
+    fast_net = TRUE,
+    edge_weight = 0.99,
+    subgraph = 2
+  )
+
+## ----eval=FALSE---------------------------------------------------------------
+#  prep_data <-
+#    function(x,
+#             object_id = NULL,
+#             account_id = NULL,
+#             content_id = NULL,
+#             timestamp_share = NULL
+#    )
 
 ## ----results='hide', eval=FALSE-----------------------------------------------
 #  # load data
@@ -43,57 +71,32 @@ summary_users <- user_stats(result)
 #  retweets <- reshape_tweets(tweets, intent = "retweets")
 #  
 #  # detect coordinated tweets
-#  result <- detect_coordinated_groups(retweets, time_window = 60, min_repetition = 10)
+#  result <- detect_groups(retweets, time_window = 60, min_participation = 10)
+#  coord_graph <- generate_coordinated_network(result, edge_weight = 0.95)
+#  
 
 ## ----results='hide', eval=FALSE-----------------------------------------------
 #  hashtags <- reshape_tweets(tweets, intent = "hashtags")
-#  result <- detect_coordinated_groups(hashtags, time_window = 60, min_repetition = 10)
+#  result <- detect_groups(hashtags, time_window = 60, min_participation = 10)
+#  coord_graph <- generate_coordinated_network(result, edge_weight = 0.95)
+#  
 
 ## ----results='hide', eval=FALSE-----------------------------------------------
 #  urls <- reshape_tweets(tweets, intent = "urls")
-#  result <- detect_coordinated_groups(urls, time_window = 60, min_repetition = 10)
+#  result <- detect_groups(urls, time_window = 60, min_participation = 10)
+#  coord_graph <- generate_coordinated_network(result, edge_weight = 0.95)
+#  
 
 ## ----results='hide', eval=FALSE-----------------------------------------------
 #  urls <- reshape_tweets(tweets, intent = "urls_domain")
-#  result <- detect_coordinated_groups(urls, time_window = 60, min_repetition = 10)
+#  result <- detect_groups(urls, time_window = 60, min_participation = 10)
+#  coord_graph <- generate_coordinated_network(result, edge_weight = 0.95)
+#  
 
 ## ----results='hide', eval=FALSE-----------------------------------------------
-#  summary_groups <- group_stats(result)
+#  summary_groups <- group_stats(result, network = "full")
+#  
 
 ## ----results='hide', eval=FALSE-----------------------------------------------
-#  library(data.table)
-#  # rename tweet column
-#  setnames(summary_groups, "object_id", "tweet_id")
-#  summary_groups <- tweets$tweets[summary_groups, on = "tweet_id"]
-
-## ----results='hide', eval=FALSE-----------------------------------------------
-#  summary_users <- user_stats(result)
-
-## ----results='hide', eval=FALSE-----------------------------------------------
-#  library(data.table)
-#  
-#  # rename user column
-#  setnames(summary_users, "id_user", "user_id")
-#  
-#  # join with pre-processed user data
-#  summary_users <- users[summary_users, on = "user_id"]
-
-## ----results='hide', eval=FALSE-----------------------------------------------
-#  library(igraph)
-#  
-#  coord_graph <- generate_network(result, intent = "objects")
-#  
-#  # E.g., get the degree of each node for filtering
-#  igraph::V(coord_graph)$degree <- igraph::degree(coord_graph)
-#  
-#  # Or we can run a community detection algorithm
-#  igraph::V(coord_graph)$cluster <- igraph::cluster_louvain(coord_graph)$membership
-
-## ----results='hide', eval=FALSE-----------------------------------------------
-#  library(data.table)
-#  dt <- data.table(tweet_id=V(coord_graph)$name,
-#                  cluster=V(coord_graph)$cluster,
-#                  degree=V(coord_graph)$degree)
-#  
-#  dt_joined <- tweets$tweets[dt, on = "tweet_id"]
+#  summary_accounts <- account_stats(result, weight_threshold = "fast")
 

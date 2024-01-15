@@ -636,13 +636,21 @@ Object.defineProperty(e,"__esModule",{value:!0}),e.mhchemParser=void 0;var r=fun
 <body>
 
 <h1 id="introduction-to-coortweet">Introduction to CooRTweet</h1>
-<p>Nicola Righetti &amp; Paul Balluff 2023-09-05</p>
+<p>Nicola Righetti &amp; Paul Balluff 2024-01-13</p>
 <h1 id="introduction">Introduction</h1>
 <p>We introduce <code>CooRTweet</code> an R-Package for detecting
-coordinated behavior on Twitter. Coordinated behavior has been defined
-as “the act of making people and/or things involved in organized
-cooperation” (Giglietto et al. 2020, 872).</p>
-<p>Coordinated behavior on social media has been used for political
+coordinated behavior on social media. Named after Twitter (now X), a
+prototypical social media platform for coordinated message amplification
+through its hashtags and trending topics affordances,
+<code>CooRTweet</code> is a general-purpose tool whose functionalities
+apply to any social media platform and even extend beyond social media.
+It enables the analysis of coordinated behavior employed by any entity
+to disseminate any content (e.g., hashtags, URLs, images, messages, or
+any other identifiable objects) via any media. It further opens up the
+possibility of cross-platform analysis.</p>
+<p>Coordinated behavior has been defined as “the act of making people
+and/or things involved in organized cooperation” (Giglietto et al. 2020,
+872). Coordinated behavior on social media has been used for political
 astroturfing (Keller et al. 2020), spreading inappropriate content
 (Giglietto et al. 2020), and activism. Detecting such behavior is
 crucial for academic research and investigative journalism.</p>
@@ -653,26 +661,29 @@ Link Sharing Behavior (CLSB) and Coordinated Image Sharing on Facebook
 and Instagram (<a href="http://coornet.org/">CooRnet website</a>).</p>
 <p>The <code>CooRTweet</code> package builds on the existing literature
 on coordinated behavior and the experience of previous software to
-provide an easy-to-use tool for detecting various coordinated networks
-on Twitter. The package is powered by <code>data.table</code> (Dowle and
-Srinivasan 2022) which makes efficient use of memory and is considerably
-fast.</p>
-<p>The package works with data retrieved from the Twitter Academic API
-V2 in JSON format. The data can be conveniently collected with the R
-package <code>academictwitteR</code> and the function
-<code>get_all_tweets</code>, which retrieves tweets and users’
-information at once. The <code>CooRTweet</code> convenience function
-<code>load_data</code> implements the state-of-the-art approach to parse
-large amount of JSON data in the fastest way currently possible
-(Eddelbuettel, Knapp, and Lemire 2023).</p>
+provide an easy-to-use tool for detecting various coordinated networks.
+The package is powered by <code>data.table</code> (Dowle and Srinivasan
+2022) which makes efficient use of memory and is considerably fast.</p>
+<p>The package is compatible with any social media, as long as the data
+set contains the required variables. It offers native support for the
+Twitter Academic API V2 in JSON format and includes a simple convenience
+function (<code>prep_data</code>) for preparing other types of data in
+the format necessary for the package.</p>
+<p>Regarding the Twitter data gathered using the R package
+<code>academictwitteR</code> and its <code>get_all_tweets</code>
+function, which simultaneously retrieves tweets and user information,
+the <code>CooRTweet</code> convenience function <code>load_data</code>
+employs the leading-edge method for parsing large volumes of JSON data
+in the most rapid manner achievable (Eddelbuettel, Knapp, and Lemire
+2023).</p>
 <h1 id="modelling-coordinated-behavior-key-parameters">Modelling
 Coordinated behavior: Key Parameters</h1>
 <p>An action <span class="math inline">\(a\)</span> on social media can
-be formalized as a user <span class="math inline">\(u\)</span> posting
-content <span class="math inline">\(p\)</span> at time <span class="math inline">\(t\)</span>:</p>
+be formalized as an account <span class="math inline">\(u\)</span>
+posting content <span class="math inline">\(p\)</span> at time <span class="math inline">\(t\)</span>:</p>
 <p><span class="math display">\[a = (p, t)\]</span></p>
 <p>Following the standard operationalization in literature, two or more
-users are defined as coordinated when they perform the <em>same
+accounts are defined as coordinated when they perform the <em>same
 action</em> at least <span class="math inline">\(r\)</span> times,
 within a predefined time interval <span class="math inline">\(\tau\)</span>. This so-called “same action” can be
 operationalized in a variety of ways:</p>
@@ -689,61 +700,57 @@ a potentially coordinated action, which means that all potentially
 coordinated actions <span class="math inline">\(A\)</span> are a set of
 unique objects: <span class="math inline">\(A = \{o_1, o_2, \ldots,
 o_n\}\)</span>.</p>
-<p>Formally, two users <span class="math inline">\(u_1\)</span> and
+<p>Formally, two accounts <span class="math inline">\(u_1\)</span> and
 <span class="math inline">\(u_2\)</span> are coordinated when their
 posts <span class="math inline">\(p_1\)</span> and <span class="math inline">\(p_2\)</span> contain the same object <span class="math inline">\(o\)</span> and the time interval <span class="math inline">\(\Delta t = |t_1 - t_2|\)</span> is smaller than
 <span class="math inline">\(\tau\)</span>: <span class="math inline">\(\Delta t \le \tau\)</span>.</p>
-<p>We group all user posts according to all uniquely identifiable
-actions. <span class="math inline">\(n(A) = N\)</span> is the total
-number of potentially coordinated groups. For example, if your dataset
-has 100 unique URLs then one URL is a object <span class="math inline">\(o_i\)</span> and <span class="math inline">\(n(A)
+<p>We group all posts according to all uniquely identifiable actions.
+<span class="math inline">\(n(A) = N\)</span> is the total number of
+potentially coordinated groups. For example, if your dataset has 100
+unique URLs then one URL is a object <span class="math inline">\(o_i\)</span> and <span class="math inline">\(n(A)
 = N = 100\)</span>.</p>
-<p>The <code>detect_coordinated_groups()</code> function permits to
-identify coordinated users through two main parameters:
-<code>min_repetition</code> (<span class="math inline">\(r\)</span>) and
-<code>time_window</code> (<span class="math inline">\(\tau\)</span>).
-Based on these two parameters the core function of
-<code>CooRTweet</code> identifies coordinated Twitter actors and
-networks.</p>
-<p>To identify coordinated networks, all pairs of users whose posts
-contain the same objects are computed, and the resulting list is then
-filtered according to the parameters <code>time_window</code> and
-<code>min_repetition</code>.</p>
-<p>Given a set of user posts <span class="math inline">\(Posts = \{p_1,
-p_2, \ldots, p_n\}\)</span> where each post <span class="math inline">\(p_i\)</span> contains the same object <span class="math inline">\(o\)</span> (e.g., sharing the same URL) then the
-total possible pairs of coordinated actions are given by</p>
-<p><span class="math display">\[\frac{n(Posts)!}{2!(n(Posts)-2)!}\]</span></p>
-<p>in R: <code>base::choose(length(posts), k=2)</code>. If 100 users
-share the exact same URL, then CooRTweet computes the time interval
-between all 4950 possible combinations.</p>
-<p>The number of possible coordinated posts <span class="math inline">\(n(Posts)\)</span> also generally increases when
-analyzing longer time intervals (<code>time_window</code>) and when
-using a low threshold for the number of repetitions
-(<code>min_repetitions</code>). CooRTweet makes this computation as
-efficient as possible using fast and memory-efficient
-<code>data.table</code> syntax.</p>
-<p>There are no standard parameters for <code>min_repetition</code> and
-<code>time_window</code> as they depend on the theoretical assumptions
-when investigating coordinated behavior. For example, if the assumption
-is that most of the coordinated users are non-human actors (e.g., bots),
-then a very short <code>time_window</code> of less than 10 seconds seems
-appropriate (<span class="math inline">\(\tau = 10\)</span>). In
-general, <em>the choice of the parameter depends on the particular case
-that you want to analyze, and it is recommended to test different
-parameter combinations</em>.</p>
+<p>Coordination detection in CooRTweet is executed through two
+sequential steps, facilitated by the functions
+<code>detect_groups</code> and
+<code>generate_coordinated_network</code>.</p>
+<p>The <code>detect_groups()</code> function enables the identification
+of accounts who shared the same objects (denoted as
+<code>object_id</code>) within a predefined time interval,
+<code>time_window</code> (represented by <span class="math inline">\(\tau\)</span>). Additionally, the function
+includes a parameter, <code>min_participation</code> (denoted as <span class="math inline">\(r\)</span>, corresponding to the
+<code>degree</code> metric in Social Network Analysis), which allows for
+filtering accounts based on a minimum participation threshold in the
+network.</p>
+<p>This function returns a data.table object, which is subsequently
+processed by the <code>generate_coordinated_network</code> function.
+This function completes the final stage of coordinated analysis. It
+involves filtering accounts who performed identical actions within the
+same timeframe, in accordance with the degree of repetition. The
+underlying assumption is that two accounts may coincidentally share the
+same objects within the same time window; however, the likelihood of
+them repeatedly sharing the same object within the same time window is
+considerably lower (Giglietto et al. 2020). The degree metric serves to
+operationalize the concept of repetition. Furthermore, the function
+computes an <code>edge_symmetry_score</code>, which aids in evaluating
+the impact of the number of shares contributed by each user on the
+edge.</p>
+<p>Based on these two functions, <code>CooRTweet</code> identifies
+coordinated actors and networks. Further information is provided in the
+function’s documentation.</p>
 <h1 id="a-usage-example">A Usage Example</h1>
 <p>We provide an anonymized version of a real dataset of coordinated
-tweets by pro-government users in Russia (Kulichkina, Righetti, and
+tweets by pro-government accounts in Russia (Kulichkina, Righetti, and
 Waldherr 2022). You can load the sample dataset as follows:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(CooRTweet)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>russian_coord_tweets</span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>russian_coord_tweets</span></code></pre></div>
 <p>The dataset has four columns which is the minimum required input data
 for detecting coordinated behavior:</p>
 <ul>
 <li><code>object_id</code>: the coordinated content. In this example the
 ID of retweeted content.</li>
-<li><code>id_user</code>: the unique ID of a twitter user.</li>
-<li><code>content_id</code>: the unique IDs of the twitter users’
+<li><code>account_id</code>: the unique ID of a twitter account.</li>
+<li><code>content_id</code>: the unique IDs of the twitter accounts’
 posts.</li>
 <li><code>timestamp_share</code>: the exact time <code>content_id</code>
 was posted by the user.</li>
@@ -752,66 +759,128 @@ was posted by the user.</li>
 number of rows of your input data</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">length</span>(russian_coord_tweets<span class="sc">$</span>content_id) <span class="sc">==</span> <span class="fu">nrow</span>(russian_coord_tweets)</span></code></pre></div>
 <p>Let’s assume that we want to detect coordinated behavior with a
-<code>min_repetition</code> of 5 within a <code>time_window</code> of 10
-seconds. We can call the main function
-<code>detect_coordinated_groups()</code> as follows:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(russian_coord_tweets, </span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>                                    <span class="at">min_repetition =</span> <span class="dv">5</span>, </span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>                                    <span class="at">time_window =</span> <span class="dv">10</span>)</span></code></pre></div>
+<code>min_participation</code> of 2 shares and a
+<code>time_window</code> of 600 seconds. We can call the first function
+<code>detect_groups()</code> as follows:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_groups</span>(russian_coord_tweets,</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>                        <span class="at">min_participation =</span> <span class="dv">2</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>                        <span class="at">time_window =</span> <span class="dv">600</span>)</span></code></pre></div>
 <p>The <code>result</code> is a <code>data.table</code> that only
-includes the users and their contents that were identified as
-coordinated with the given parameters. The <code>result</code> is in a
-wide-format, where it shows the time difference
-(<code>time_delta</code>) between two posts (<code>content_id</code> and
-<code>content_id_y</code>). <code>result</code> is sorted in such a way
-that the “older” posts are represented by <code>content_id</code> and
-the “newer” posts by <code>content_id_y</code>. For example, if User A
-retweets a post of User B, then the Tweet by User A is the “newer” post.
-Sorting the <code>result</code> this way has the advantage that the
-direction of cascaded coordination can be tracked.</p>
+includes the accounts and their contents that were shared within the
+given parameters. The <code>result</code> is in a wide-format, where it
+shows the time difference (<code>time_delta</code>) between two posts
+(<code>content_id</code> and <code>content_id_y</code>).
+<code>result</code> is sorted in such a way that the “older” posts are
+represented by <code>content_id</code> and the “newer” posts by
+<code>content_id_y</code>. For example, if User A retweets a post of
+User B, then the Tweet by User A is the “newer” post. Sorting the
+<code>result</code> this way has the advantage that the direction of
+cascaded coordination can be tracked.</p>
+<p>The coordinated detection is then completed by applying the other
+function. We set the “objects” option to TRUE so that the graph keeps
+the list of objects shared by accounts, for later inspection via the
+<code>group_stats</code> function. We also set a filter on the graph
+that identifies edges with a weight greater than 99% of the edges weight
+in the graph. This is used to identify accounts who repeatedly share
+<code>object_id</code> (i.e, any type of identified content) in the same
+<code>time_window</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>coord_graph <span class="ot">&lt;-</span> <span class="fu">generate_coordinated_network</span>(result, <span class="at">edge_weight =</span> <span class="fl">0.99</span>, <span class="at">objects =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>The edge_weight option creates a weight_threshold vector that is 1 if
+the edge exceeds the threshold value, and 0 otherwise. For example, in
+this case, the threshold value corresponds to a minimum edge weight of
+3.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;igraph&#39;</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from &#39;package:stats&#39;:</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt;     decompose, spectrum</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:base&#39;:</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt;     union</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="fu">min</span>(<span class="fu">E</span>(coord_graph)<span class="sc">$</span>weight[<span class="fu">E</span>(coord_graph)<span class="sc">$</span>weight_threshold <span class="sc">==</span> <span class="dv">1</span>])</span></code></pre></div>
+<p>Edge weight is not a perfect measure in an undirected graph, as it
+can be influenced by extreme values from a user. Therefore, an
+equilibrium measure, balancing the contributions of each of the two
+nodes on every edge, is concurrently computed. This measure, called
+<code>edge_symmetry_score</code>, equals 1 when the contribution is
+perfectly even and approaches zero in other cases.</p>
 <p>We can quickly get some summary statistics by using the provided
 convenience functions <code>group_stats()</code> and
-<code>user_stats()</code>. If we are interested in the content that
-users share in a coordinated fashion, we can call
-<code>group_stats()</code> and pass in our <code>results</code>
-table:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>summary_groups <span class="ot">&lt;-</span> <span class="fu">group_stats</span>(result)</span></code></pre></div>
-<p><code>summary_groups</code> shows how many coordinated users (column
-<code>users</code>) participated for each unique shared object
-(<code>object_id</code>), how many coordinated posts
-(<code>posts</code>) were published and their average time delay
-(<code>mean_time_delta</code>). In this case, we have retweets,
-therefore, you can interpret the results as follows: 2 users retweeted
-the tweet with the id <code>4a5c13a7f533d6ebc27bec5581ad5a9f</code>
-within an average time delay of 2 seconds.</p>
+<code>account_stats()</code>. If we are interested in the content that
+accounts share in a coordinated fashion, we can call
+<code>group_stats()</code> and pass in our <code>igraph</code> object
+from the <code>generate_coordinated_network</code> function:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>summary_groups <span class="ot">&lt;-</span> <span class="fu">group_stats</span>(coord_graph, <span class="at">weight_threshold =</span> <span class="st">&quot;full&quot;</span>)</span></code></pre></div>
+<p><code>summary_groups</code> shows how many accounts (column
+<code>num_accounts</code>) participated for each unique shared object
+(<code>object_id</code>).</p>
 <p>If you are interested in understanding more about the users you can
-call <code>user_stats()</code>:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>summary_users <span class="ot">&lt;-</span> <span class="fu">user_stats</span>(result)</span></code></pre></div>
-<p><code>summary_users</code> shows that the user with the ID
-<code>dcaec387c76f1d26a0d51f61227fdac0</code> shared a total of 6
-coordinated posts and within an average time window of 4.3 seconds.</p>
+call <code>account_stats()</code>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>summary_accounts <span class="ot">&lt;-</span> <span class="fu">account_stats</span>(coord_graph, result, <span class="at">weight_threshold =</span> <span class="st">&quot;full&quot;</span>)</span></code></pre></div>
+<p>The documentation for each function includes details and possible
+options).</p>
+<p>You can focus on a narrower time window by updating the result of the
+<code>detect_group</code> function via the <code>flag_speed_share</code>
+function.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>result_update <span class="ot">&lt;-</span> <span class="fu">flag_speed_share</span>(russian_coord_tweets, result, <span class="at">min_participation =</span> <span class="dv">2</span>, <span class="at">time_window =</span> <span class="dv">120</span>)</span></code></pre></div>
+<p>This function creates a new column marking the edges that meet the
+new condition.</p>
+<p>Using special options of the
+<code>generate_coordinated_network</code> function, we can get the graph
+of accounts who have shared content faster and whose edge are above the
+threshold (<code>subgraph = 2</code>). Other options allow for the
+general network filtered by edge weight (<code>subgraph = 1</code>) or
+the subgraph whose nodes exhibit coordinated behavior in the narrowest
+time window established with the <code>flag_speed_share</code> function
+(fast subgraph), and the vertices adjacent to their edges
+(<code>subgraph = 3</code>).</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>coord_graph_fast <span class="ot">&lt;-</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="fu">generate_coordinated_network</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>    result_update,</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>    <span class="at">fast_net =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>    <span class="at">edge_weight =</span> <span class="fl">0.99</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>    <span class="at">subgraph =</span> <span class="dv">2</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  )</span></code></pre></div>
 <h1 id="using-your-own-data">Using your own data</h1>
-<p>Of course, you want to use the package with your own data that you
-retrieved from the Twitter API (V2). We guide you here quickly through
-the process.</p>
+<p>Any dataset can be utilized with CooRTweet, provided it includes the
+necessary data. The convenience function <code>prep_data</code>
+facilitates the creation of an appropriate data format for further
+processing. Users need only to specify the columns in their dataset
+corresponding to the required ones, namely, a column with the desired
+object to be tracked (<code>object_id</code>), the account (or user) IDs
+(<code>account_id</code>), the IDs of the content featuring the object
+(<code>content_id</code>), and the timestamps of the shares
+(<code>timestamp_share</code>).</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>prep_data <span class="ot">&lt;-</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="cf">function</span>(x,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>           <span class="at">object_id =</span> <span class="cn">NULL</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>           <span class="at">account_id =</span> <span class="cn">NULL</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>           <span class="at">content_id =</span> <span class="cn">NULL</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>           <span class="at">timestamp_share =</span> <span class="cn">NULL</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>  )</span></code></pre></div>
+<p>If you want to use the package with your own data that you retrieved
+from the Twitter API (V2), we guide you here quickly through the
+process.</p>
 <h2 id="load-raw-data-and-preprocess">Load Raw Data and Preprocess</h2>
 <p>We assume that all your tweets are stored as JSON files in a
 directory. You can load the JSON data with the
 <code>load_tweets_json()</code> and
 <code>load_twitter_users_json()</code> functions</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># load data</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>raw <span class="ot">&lt;-</span> <span class="fu">load_tweets_json</span>(<span class="st">&#39;path/to/data/with/jsonfiles&#39;</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>users <span class="ot">&lt;-</span> <span class="fu">load_twitter_users_json</span>(<span class="st">&#39;path/to/data/with/jsonfiles&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># load data</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>raw <span class="ot">&lt;-</span> <span class="fu">load_tweets_json</span>(<span class="st">&#39;path/to/data/with/jsonfiles&#39;</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>users <span class="ot">&lt;-</span> <span class="fu">load_twitter_users_json</span>(<span class="st">&#39;path/to/data/with/jsonfiles&#39;</span>)</span></code></pre></div>
 <p><strong>If you cannot load your Twitter data, please feel free to
 raise an issue in our <a href="https://github.com/nicolarighetti/CooRTweet/">Github
 repository</a>. We are happy to help!</strong></p>
 <p>Twitter data is nested and difficult to handle, so we also provide a
 simple pre-processing function that unnests the data:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># preprocess (unnest) data</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>tweets <span class="ot">&lt;-</span> <span class="fu">preprocess_tweets</span>(raw)</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>users <span class="ot">&lt;-</span> <span class="fu">preprocess_twitter_users</span>(users)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># preprocess (unnest) data</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>tweets <span class="ot">&lt;-</span> <span class="fu">preprocess_tweets</span>(raw)</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>users <span class="ot">&lt;-</span> <span class="fu">preprocess_twitter_users</span>(users)</span></code></pre></div>
 <p>The resulting <code>tweets</code> is a named list, where each item is
 a <code>data.table</code>. The five <code>data.table</code>s are:
 <code>tweets</code>, <code>referenced</code>, <code>urls</code>,
@@ -819,8 +888,8 @@ a <code>data.table</code>. The five <code>data.table</code>s are:
 sorted and avoids redundant rows.</p>
 <p>To access the tweets you can simply use <code>tweets$tweets</code>
 and view your dataset.</p>
-<h2 id="coordination-detection-and-reshaping">Coordination Detection and
-Reshaping</h2>
+<h2 id="coordination-detection-and-reshaping-twitter-data">Coordination
+Detection and Reshaping Twitter Data</h2>
 <p>The <code>reshape_tweets</code> function makes it possible to reshape
 Twitter data for detecting different types of coordinated behavior. The
 parameter <code>intent</code> of this function permits to choose between
@@ -830,76 +899,53 @@ behavior; <code>hashtags</code>, for coordinated usage of hashtags;
 <code>urls_domain</code> to detect coordinated link sharing behavior at
 the domain level.</p>
 <h3 id="coordination-by-retweets">Coordination by Retweets</h3>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># reshape data</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>retweets <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;retweets&quot;</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co"># detect coordinated tweets</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(retweets, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_repetition =</span> <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># reshape data</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>retweets <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;retweets&quot;</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co"># detect coordinated tweets</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_groups</span>(retweets, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_participation =</span> <span class="dv">10</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>coord_graph <span class="ot">&lt;-</span> <span class="fu">generate_coordinated_network</span>(result, <span class="at">edge_weight =</span> <span class="fl">0.95</span>)</span></code></pre></div>
 <h3 id="coordination-by-hashtags">Coordination by Hashtags</h3>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>hashtags <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;hashtags&quot;</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(hashtags, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_repetition =</span> <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>hashtags <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;hashtags&quot;</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_groups</span>(hashtags, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_participation =</span> <span class="dv">10</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>coord_graph <span class="ot">&lt;-</span> <span class="fu">generate_coordinated_network</span>(result, <span class="at">edge_weight =</span> <span class="fl">0.95</span>)</span></code></pre></div>
 <h3 id="coordination-by-link-sharing">Coordination by Link Sharing</h3>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>urls <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;urls&quot;</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(urls, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_repetition =</span> <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>urls <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;urls&quot;</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_groups</span>(urls, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_participation =</span> <span class="dv">10</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>coord_graph <span class="ot">&lt;-</span> <span class="fu">generate_coordinated_network</span>(result, <span class="at">edge_weight =</span> <span class="fl">0.95</span>)</span></code></pre></div>
 <h3 id="coordination-by-link-sharing-considering-only-the-domain">Coordination
 by Link Sharing (considering only the domain)</h3>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>urls <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;urls_domain&quot;</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_coordinated_groups</span>(urls, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_repetition =</span> <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>urls <span class="ot">&lt;-</span> <span class="fu">reshape_tweets</span>(tweets, <span class="at">intent =</span> <span class="st">&quot;urls_domain&quot;</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">detect_groups</span>(urls, <span class="at">time_window =</span> <span class="dv">60</span>, <span class="at">min_participation =</span> <span class="dv">10</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>coord_graph <span class="ot">&lt;-</span> <span class="fu">generate_coordinated_network</span>(result, <span class="at">edge_weight =</span> <span class="fl">0.95</span>)</span></code></pre></div>
 <h3 id="get-summaries-of-results">Get summaries of results</h3>
 <p>There are two functions that give summaries of the
-<code>result</code> data: <code>group_stats()</code> and
-<code>user_stats()</code>.</p>
-<p>To get insights on the coordinated content (groups), use
-<code>group_stats()</code></p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>summary_groups <span class="ot">&lt;-</span> <span class="fu">group_stats</span>(result)</span></code></pre></div>
+<code>igraph</code> data resulting from the
+<code>generate_coordinated_network</code> function:
+<code>group_stats()</code> and <code>account_stats()</code>.</p>
+<p>To get insights on the objects shared in the network (groups), use
+<code>group_stats()</code>.Depending on whether you want statistics for
+the general network, or for the fastest network if it has been computed
+via the <code>flag_speed_share</code> function, you can specify “fast”
+or “full” in the “network” argument.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>summary_groups <span class="ot">&lt;-</span> <span class="fu">group_stats</span>(result, <span class="at">network =</span> <span class="st">&quot;full&quot;</span>)</span></code></pre></div>
 <p>It returns a <code>data.table</code> which shows the group statistics
-for total count of unique users, total posts in per group, and average
-time delta per group. If your group analysis is focused on retweets, you
-can join the data back as follows:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co"># rename tweet column</span></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="fu">setnames</span>(summary_groups, <span class="st">&quot;object_id&quot;</span>, <span class="st">&quot;tweet_id&quot;</span>)</span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>summary_groups <span class="ot">&lt;-</span> tweets<span class="sc">$</span>tweets[summary_groups, on <span class="ot">=</span> <span class="st">&quot;tweet_id&quot;</span>]</span></code></pre></div>
-<p>If you are interested in the user statistics, you can pass
-<code>result</code> into <code>user_stats()</code></p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>summary_users <span class="ot">&lt;-</span> <span class="fu">user_stats</span>(result)</span></code></pre></div>
-<p>It provides summary statistics for each user that participated in
-coordinated behavior: total coordinated posts shared, and average time
-delta. High number of posts shared and low average time delta are
-indicators for highly coordinated (and potentially automated) user
-behavior.</p>
-<p>You can rejoin these summary statistics with the original data as
-follows (using <code>data.table</code> syntax):</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co"># rename user column</span></span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="fu">setnames</span>(summary_users, <span class="st">&quot;id_user&quot;</span>, <span class="st">&quot;user_id&quot;</span>)</span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co"># join with pre-processed user data</span></span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>summary_users <span class="ot">&lt;-</span> users[summary_users, on <span class="ot">=</span> <span class="st">&quot;user_id&quot;</span>]</span></code></pre></div>
-<h3 id="generate-a-network">Generate a network</h3>
-<p>We provide a utility function to transform the <code>result</code> to
-an <a href="https://r.igraph.org/"><code>igraph</code></a> object for
-further analysis. In this example, we want to investigate the
-coordinated content, and how they are connected.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>coord_graph <span class="ot">&lt;-</span> <span class="fu">generate_network</span>(result, <span class="at">intent =</span> <span class="st">&quot;objects&quot;</span>)</span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="co"># E.g., get the degree of each node for filtering</span></span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>degree <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">degree</span>(coord_graph)</span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="co"># Or we can run a community detection algorithm</span></span>
-<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>cluster <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">cluster_louvain</span>(coord_graph)<span class="sc">$</span>membership</span></code></pre></div>
-<p>Then, we can join the graph back to the original
-<code>data.table</code>, with additional information, such as the
-cluster for each content:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>dt <span class="ot">&lt;-</span> <span class="fu">data.table</span>(<span class="at">tweet_id=</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>name,</span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>                <span class="at">cluster=</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>cluster,</span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>                <span class="at">degree=</span><span class="fu">V</span>(coord_graph)<span class="sc">$</span>degree)</span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a></span>
-<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>dt_joined <span class="ot">&lt;-</span> tweets<span class="sc">$</span>tweets[dt, on <span class="ot">=</span> <span class="st">&quot;tweet_id&quot;</span>]</span></code></pre></div>
+for total count of unique accounts that shared that object.</p>
+<p>If you are interested in the account statistics, you can pass the
+<code>igraph</code> resulting from
+<code>generate_coordinated_network</code> into
+<code>account_stats()</code>. Depending on whether you want statistics
+for the general network, or for the fastest network, if it has been
+calculated via the <code>flag_speed_share</code> function, you can
+spefic “fast,” or you need to specify “full,” or “none,” in the
+“weight_threshold” argument.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>summary_accounts <span class="ot">&lt;-</span> <span class="fu">account_stats</span>(result, <span class="at">weight_threshold =</span> <span class="st">&quot;fast&quot;</span>)</span></code></pre></div>
+<p>It provides summary statistics for each account in the network: total
+coordinated posts shared (<code>content_id</code>), and average time
+delta (more specifically, this value represents the average of the mean
+time_delta values of each account). High number of posts shared and low
+average time delta might suggest highly coordinated (and potentially
+automated) account behavior.</p>
 <h1 id="references">References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent">
 
