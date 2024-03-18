@@ -145,6 +145,11 @@ generate_coordinated_network <- function(x,
     # equivalently. Optionally, it includes objects shared by accounts identified
     # as coordinated, in the course of their coordinated activity.
 
+    # create a true duplicate of result and avoid overwriting
+    result <- x
+    x <- data.table::copy(result)
+    rm(result)
+
     # standardize the order of the vertices
     x[, `:=`(
         account_id = pmin(account_id, account_id_y),

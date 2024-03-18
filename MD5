@@ -1,13 +1,13 @@
-d72a52b8f88de5900a67c3fb8ce1af5a *DESCRIPTION
+864ad9aef54792da405865706ad9b880 *DESCRIPTION
 d96c1fd5506451fb24591bb103ec4d73 *LICENSE
 18d38a2be1683c82de1a229c7e48ac70 *NAMESPACE
-b522922b47c6b0bbaf3c3c75d082bf04 *NEWS.md
+ad8d852334286eae118959d25721168c *NEWS.md
 bba126993e17bf8ace13d2ae4a880b97 *R/account_stats.R
 ae0bbfeedcc250578a7096534901d9a0 *R/calc_group_combinations.R
 a0d55daa897ea9cb252eafac43a46942 *R/data.R
 db5b2bc8d6ef63db0848aa18aa4f5a41 *R/detect_groups.R
 46e4fb6dbe3af1753cbc613860f86605 *R/flag_speed_share.R
-70ae803fe290a0f09b851862311f74ca *R/generate_coordinated_network.R
+bafb24232501519a83450e399e045850 *R/generate_coordinated_network.R
 069bcad82d09bb02dc45abbbf134eff0 *R/globals.R
 fb988dab3a31c37bb11662d520a69a7f *R/group_stats.r
 e107cd8c8b496fbb07e90aa311b42912 *R/load_data.R
@@ -19,7 +19,7 @@ faf3811598e6a9df969b6243ff3d1db7 *build/vignette.rds
 99b882495d2117f8fc4463c557551444 *data/russian_coord_tweets.rda
 5771d27d6c99e155810aace5f78ecf9f *inst/doc/vignette.R
 3f3bfc72274f58a2de3665c0d9755724 *inst/doc/vignette.Rmd
-1f745843c8a7945d726764ff82c72ff4 *inst/doc/vignette.html
+e0bcf47d5b9f8f65ac601d83ca47fd36 *inst/doc/vignette.html
 aaed97168f9277833970069994f04f7d *man/account_stats.Rd
 7b817f73e35481846c51f0cf11868971 *man/detect_groups.Rd
 44e0ed533d914bc9e7966a3dc1c2e8c4 *man/do_remove_loops.Rd
