@@ -1,6 +1,6 @@
 Package: CooRTweet
-Version: 2.0.1
-Date: 2024-03-18
+Version: 2.0.2
+Date: 2024-03-28
 Type: Package
 Title: Coordinated Networks Detection on Social Media
 Description: Detects a variety of coordinated actions on social media and outputs the network of coordinated users along with related information.
@@ -31,6 +31,6 @@ Depends: R (>= 3.5.0)
 LazyData: true
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2024-03-18 12:09:48 UTC; righetti
+Packaged: 2024-03-28 08:46:25 UTC; righetti
 Repository: CRAN
-Date/Publication: 2024-03-18 12:30:02 UTC
+Date/Publication: 2024-03-29 07:20:07 UTC
