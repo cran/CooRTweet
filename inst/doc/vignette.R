@@ -5,109 +5,97 @@ knitr::opts_chunk$set(
 )
 library(CooRTweet)
 
-## ----results='hide'-----------------------------------------------------------
+## ----install, eval = FALSE----------------------------------------------------
+#  # Install from CRAN
+#  install.packages("CooRTweet")
+#  
+#  # Or install the development version from GitHub
+#  devtools::install_github("username/CooRTweet") # Replace with actual GitHub repository
+
+## ----data-preparation---------------------------------------------------------
 library(CooRTweet)
-set.seed(123)
-russian_coord_tweets
+head(russian_coord_tweets)
 
-## ----results='hide'-----------------------------------------------------------
-length(russian_coord_tweets$content_id) == nrow(russian_coord_tweets)
+## ----detect-groups------------------------------------------------------------
+result <- detect_groups(
+  x = russian_coord_tweets,
+  min_participation = 2,
+  time_window = 60
+)
+head(result)
 
-## ----results='hide'-----------------------------------------------------------
-result <- detect_groups(russian_coord_tweets,
-                        min_participation = 2,
-                        time_window = 600)
+## ----generate-network---------------------------------------------------------
+graph <- generate_coordinated_network(
+  result,
+  edge_weight = 0.5
+)
+graph
 
-## -----------------------------------------------------------------------------
-combined_accounts <- c(result$account_id, result$account_id_y)
-combined_accounts_dt <- data.table::data.table(account_id = combined_accounts)
-account_counts <- combined_accounts_dt[, .N, by = account_id]
+## ----multi-modal-analysis-----------------------------------------------------
+# Example datasets for different content types
+head(german_elections)
 
-russian_coord_tweets <- data.table::as.data.table(russian_coord_tweets)
-raw_counts <- russian_coord_tweets[, .N, by = account_id]
-raw_counts_included <- raw_counts[account_id %in% combined_accounts] 
+# Prepare data --------------------
 
-# min_participation
-min(raw_counts_included$N)
+# URLs
+urls_data <- prep_data(german_elections,
+                       object_id = "url_id",
+                       account_id = "account_id",
+                       content_id = "post_id",
+                       timestamp_share = "timestamp")
 
-## -----------------------------------------------------------------------------
-coord_graph <- generate_coordinated_network(result, edge_weight = 0.99, objects = TRUE)
+urls_data <- unique(urls_data,
+                    by = c("object_id", "account_id", "content_id", "timestamp_share"))
 
-## ----results='hide'-----------------------------------------------------------
-library(igraph)
+urls_data <- urls_data[!is.na(object_id)]
 
-min(E(coord_graph)$weight[E(coord_graph)$weight_threshold == 1])
+urls_data$object_id <- paste0("url_", urls_data$object_id)
 
-## ----results='hide'-----------------------------------------------------------
-summary_groups <- group_stats(coord_graph = coord_graph, weight_threshold = "full")
+# images (pHash)
+img_data <- prep_data(german_elections,
+                      object_id = "phash_id",
+                      account_id = "account_id",
+                      content_id = "post_id",
+                      timestamp_share = "timestamp")
 
-## ----results='hide'-----------------------------------------------------------
-summary_accounts <- account_stats(coord_graph = coord_graph, result = result, weight_threshold = "full")
+img_data <- unique(img_data,
+                   by = c("object_id", "account_id", "content_id", "timestamp_share"))
 
-## -----------------------------------------------------------------------------
-result_update <- flag_speed_share(russian_coord_tweets, result, min_participation = 2, time_window = 120)
+img_data <- img_data[!is.na(object_id)]
 
-## -----------------------------------------------------------------------------
-coord_graph_fast <-
-  generate_coordinated_network(
-    result_update,
-    fast_net = TRUE,
-    edge_weight = 0.99,
-    subgraph = 2
-  )
+img_data$object_id <- paste0("hash_", img_data$object_id)
 
-## ----eval=FALSE---------------------------------------------------------------
-#  prep_data <-
-#    function(x,
-#             object_id = NULL,
-#             account_id = NULL,
-#             content_id = NULL,
-#             timestamp_share = NULL
-#    )
 
-## ----results='hide', eval=FALSE-----------------------------------------------
-#  # load data
-#  
-#  raw <- load_tweets_json('path/to/data/with/jsonfiles')
-#  users <- load_twitter_users_json('path/to/data/with/jsonfiles')
+# Detect coordinated groups for URLs and hashtags  --------------------
+result_urls <- detect_groups(urls_data, time_window = 30,
+                             min_participation = 2)
 
-## ----results='hide', eval=FALSE-----------------------------------------------
-#  # preprocess (unnest) data
-#  
-#  tweets <- preprocess_tweets(raw)
-#  users <- preprocess_twitter_users(users)
+result_images <- detect_groups(img_data, time_window = 30,
+                               min_participation = 2)
 
-## ----results='hide', eval=FALSE-----------------------------------------------
-#  # reshape data
-#  retweets <- reshape_tweets(tweets, intent = "retweets")
-#  
-#  # detect coordinated tweets
-#  result <- detect_groups(retweets, time_window = 60, min_participation = 10)
-#  coord_graph <- generate_coordinated_network(result, edge_weight = 0.95)
-#  
+# Combine results  --------------------
+library(data.table)
 
-## ----results='hide', eval=FALSE-----------------------------------------------
-#  hashtags <- reshape_tweets(tweets, intent = "hashtags")
-#  result <- detect_groups(hashtags, time_window = 60, min_participation = 10)
-#  coord_graph <- generate_coordinated_network(result, edge_weight = 0.95)
-#  
+combined_results <- rbindlist( 
+    list(result_urls, result_images),
+    use.names = TRUE,
+    fill = TRUE
+)
 
-## ----results='hide', eval=FALSE-----------------------------------------------
-#  urls <- reshape_tweets(tweets, intent = "urls")
-#  result <- detect_groups(urls, time_window = 60, min_participation = 10)
-#  coord_graph <- generate_coordinated_network(result, edge_weight = 0.95)
-#  
+# Generate the coordinated multi-modal network  --------------------
+graph <- generate_coordinated_network(combined_results, edge_weight = 0.5)
+graph
 
-## ----results='hide', eval=FALSE-----------------------------------------------
-#  urls <- reshape_tweets(tweets, intent = "urls_domain")
-#  result <- detect_groups(urls, time_window = 60, min_participation = 10)
-#  coord_graph <- generate_coordinated_network(result, edge_weight = 0.95)
-#  
-
-## ----results='hide', eval=FALSE-----------------------------------------------
-#  summary_groups <- group_stats(coord_graph = coord_graph, weight_threshold = "full")
-#  
-
-## ----results='hide', eval=FALSE-----------------------------------------------
-#  summary_accounts <- account_stats(coord_graph = coord_graph, result = result, weight_threshold = "fast")
+## ----visualize-network, eval = FALSE------------------------------------------
+#  library(igraph)
+#  plot.igraph(
+#      graph,
+#      layout = layout.fruchterman.reingold,
+#      edge.width = 0.5,
+#      edge.curved = 0.3,
+#      vertex.size = 3,
+#      vertex.frame.color = "grey",
+#      vertex.frame.width = 0.1,
+#      vertex.label = NA
+#  )
 
