@@ -6,11 +6,11 @@ knitr::opts_chunk$set(
 library(CooRTweet)
 
 ## ----install, eval = FALSE----------------------------------------------------
-#  # Install from CRAN
-#  install.packages("CooRTweet")
-#  
-#  # Or install the development version from GitHub
-#  devtools::install_github("username/CooRTweet") # Replace with actual GitHub repository
+# # Install from CRAN
+# install.packages("CooRTweet")
+# 
+# # Or install the development version from GitHub
+# devtools::install_github("username/CooRTweet") # Replace with actual GitHub repository
 
 ## ----data-preparation---------------------------------------------------------
 library(CooRTweet)
@@ -31,12 +31,11 @@ graph <- generate_coordinated_network(
 )
 graph
 
-## ----multi-modal-analysis-----------------------------------------------------
+## ----german-elections---------------------------------------------------------
 # Example datasets for different content types
 head(german_elections)
 
-# Prepare data --------------------
-
+## ----multimodal-urls----------------------------------------------------------
 # URLs
 urls_data <- prep_data(german_elections,
                        object_id = "url_id",
@@ -51,6 +50,7 @@ urls_data <- urls_data[!is.na(object_id)]
 
 urls_data$object_id <- paste0("url_", urls_data$object_id)
 
+## ----multimodal-images--------------------------------------------------------
 # images (pHash)
 img_data <- prep_data(german_elections,
                       object_id = "phash_id",
@@ -65,7 +65,7 @@ img_data <- img_data[!is.na(object_id)]
 
 img_data$object_id <- paste0("hash_", img_data$object_id)
 
-
+## ----multimodal-detect groups-------------------------------------------------
 # Detect coordinated groups for URLs and hashtags  --------------------
 result_urls <- detect_groups(urls_data, time_window = 30,
                              min_participation = 2)
@@ -73,6 +73,8 @@ result_urls <- detect_groups(urls_data, time_window = 30,
 result_images <- detect_groups(img_data, time_window = 30,
                                min_participation = 2)
 
+
+## ----multimodal-stack---------------------------------------------------------
 # Combine results  --------------------
 library(data.table)
 
@@ -82,20 +84,21 @@ combined_results <- rbindlist(
     fill = TRUE
 )
 
+## ----multimodal-generate-network----------------------------------------------
 # Generate the coordinated multi-modal network  --------------------
 graph <- generate_coordinated_network(combined_results, edge_weight = 0.5)
 graph
 
 ## ----visualize-network, eval = FALSE------------------------------------------
-#  library(igraph)
-#  plot.igraph(
-#      graph,
-#      layout = layout.fruchterman.reingold,
-#      edge.width = 0.5,
-#      edge.curved = 0.3,
-#      vertex.size = 3,
-#      vertex.frame.color = "grey",
-#      vertex.frame.width = 0.1,
-#      vertex.label = NA
-#  )
+# library(igraph)
+# plot.igraph(
+#     graph,
+#     layout = layout.fruchterman.reingold,
+#     edge.width = 0.5,
+#     edge.curved = 0.3,
+#     vertex.size = 3,
+#     vertex.frame.color = "grey",
+#     vertex.frame.width = 0.1,
+#     vertex.label = NA
+# )
 

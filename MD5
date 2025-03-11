@@ -1,4 +1,4 @@
-bd8e60c6ac425ebbf7cbbccb2220a72f *DESCRIPTION
+93948cd84ba4cc8e61238a934a4a6a88 *DESCRIPTION
 d96c1fd5506451fb24591bb103ec4d73 *LICENSE
 a7c1465bde3b22fe1d3e32d2d59f0795 *NAMESPACE
 48f5f09cfa65f3955b3efed47db1e0bb *NEWS.md
@@ -19,9 +19,9 @@ ad3be6e390b7e7303d530223cd14d032 *R/simulate_data.R
 030141c1a350c4c3333afa6c015b8fcc *build/vignette.rds
 b728148ff8e4fdebb42e0effea10198f *data/german_elections.rda
 99b882495d2117f8fc4463c557551444 *data/russian_coord_tweets.rda
-a2c9dc7e58d71e8b5d0f4224ad2537ca *inst/doc/vignette.R
-9358e3482b41c1a7151de8873917a4d2 *inst/doc/vignette.Rmd
-c075e9190230fc339c6968fa6136f8c6 *inst/doc/vignette.html
+1c2d29fe5c2b5d059849bf2feb959c5d *inst/doc/vignette.R
+1e1267820b6fe708f19eb6f679d40573 *inst/doc/vignette.Rmd
+53db11031042ef68928808f4dde194b4 *inst/doc/vignette.html
 aaed97168f9277833970069994f04f7d *man/account_stats.Rd
 845af48cfb32284a7305fb187a7398d2 *man/detect_groups.Rd
 44e0ed533d914bc9e7966a3dc1c2e8c4 *man/do_remove_loops.Rd
@@ -43,5 +43,5 @@ d21ee1fa61087b0115420e85e3a72dba *man/russian_coord_tweets.Rd
 8d28076710c07e1855460a051f190b1e *man/simulate_data.Rd
 d8779cbe35e742aabddcc565522e576b *tests/testthat.R
 e4a0c8a8b98d68eb6749336050a3994d *tests/testthat/test-sample_data.R
-a7f183691a96054b3ed035bdde62dd17 *vignettes/references.bib
-9358e3482b41c1a7151de8873917a4d2 *vignettes/vignette.Rmd
+19a2ea812a9824a6c7d5492e8481fcfe *vignettes/references.bib
+1e1267820b6fe708f19eb6f679d40573 *vignettes/vignette.Rmd
