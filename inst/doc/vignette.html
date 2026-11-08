@@ -49,8 +49,9 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -61,7 +62,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -149,7 +150,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; }
 div.csl-bib-body { }
 div.csl-entry {
 clear: both;
-margin-bottom: 0em;
 }
 .hanging div.csl-entry {
 margin-left:2em;
@@ -362,7 +362,6 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Introduction to CooRTweet</h1>
 <h4 class="author">Nicola Righetti &amp; Paul Balluff</h4>
-<h4 class="date">11, March 2025</h4>
 
 
 
@@ -382,6 +381,9 @@ the uncoordinated network in which the coordination is contextualized.
 CooRTweet is one of the first software tools for coordinated detection
 to have undergone rigorous validation. With its output, researchers can
 effectively explore networks of coordinated activity.</p>
+<p>The methodological rationale and a cross-platform case study are
+described in the <a href="https://doi.org/10.5117/CCR2025.1.7.RIGH">CooRTweet paper</a>
+<span class="citation">(Righetti and Balluff 2025)</span>.</p>
 </div>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
@@ -391,7 +393,7 @@ GitHub:</p>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;CooRTweet&quot;</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co"># Or install the development version from GitHub</span></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;username/CooRTweet&quot;</span>) <span class="co"># Replace with actual GitHub repository</span></span></code></pre></div>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;nicolarighetti/CooRTweet&quot;</span>)</span></code></pre></div>
 </div>
 <div id="key-features" class="section level2">
 <h2>Key Features</h2>
@@ -404,16 +406,22 @@ repetition/edge-weight thresholds to detect coordinated activities.</li>
 as <code>igraph</code> objects for further analysis and
 visualization.</li>
 <li><strong>Included Data</strong>: Comes with datasets for learning
-<span class="citation">Righetti et al. (2022)</span> and a
-<code>simulate_data</code> function to generate synthetic coordinated
-networks.</li>
+<span class="citation"><span class="nocase">Righetti et al.</span>
+(2022)</span> and a <code>simulate_data</code> function to generate
+synthetic coordinated networks. The installed package includes
+<code>german_elections_sample</code>, an anonymized excerpt for
+examples, not the full published study.</li>
 </ol>
 </div>
 <div id="getting-started" class="section level2">
 <h2>Getting Started</h2>
 <div id="input-data-format" class="section level3">
 <h3>Input Data Format</h3>
-<p>The input dataset should include the following columns:</p>
+<p>The input dataset should include the following columns.
+<code>prep_data()</code> can rename source columns to these names and,
+by default, removes rows with missing values and duplicate shares. Use
+<code>drop_na = FALSE</code> or <code>drop_duplicates = FALSE</code> to
+retain them.</p>
 <ul>
 <li><code>object_id</code>: A unique identifier for the shared content
 (data type: character).</li>
@@ -477,129 +485,179 @@ accounts coordinating within a specified time window.</p>
 <span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt; 5: 7289281c087ccc0342d96604243d0069</span></span>
 <span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt; 6: 3dced626839250a9c9bf41a381234214</span></span></code></pre></div>
 </div>
+<div id="select-an-inclusive-time-interval" class="section level3">
+<h3>Select an Inclusive Time Interval</h3>
+<p>Set <code>time_window_low</code> to select one interval of time
+differences. Both limits are included. The shares below occur at 0, 10,
+and 30 seconds; selecting 10 through 20 seconds keeps the pairs exactly
+10 and 20 seconds apart:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>shares <span class="ot">&lt;-</span> data.table<span class="sc">::</span><span class="fu">data.table</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">object_id =</span> <span class="st">&quot;url_1&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">account_id =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">content_id =</span> <span class="fu">c</span>(<span class="st">&quot;p1&quot;</span>, <span class="st">&quot;p2&quot;</span>, <span class="st">&quot;p3&quot;</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="at">timestamp_share =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">30</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>interval_result <span class="ot">&lt;-</span> <span class="fu">detect_groups</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  shares, <span class="at">time_window =</span> <span class="dv">20</span>, <span class="at">time_window_low =</span> <span class="dv">10</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  <span class="at">min_participation =</span> <span class="dv">1</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>)</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="fu">sort</span>(interval_result<span class="sc">$</span>time_delta)</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; [1] 10 20</span></span></code></pre></div>
+<p>The default <code>time_window_low = 0</code> also includes pairs
+shared at the same second.</p>
+</div>
 <div id="generate-coordination-networks" class="section level3">
 <h3>Generate Coordination Networks</h3>
 <p>Convert detected groups into a coordination network using
-<code>generate_coordinated_network()</code>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>graph <span class="ot">&lt;-</span> <span class="fu">generate_coordinated_network</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  result,</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">edge_weight =</span> <span class="fl">0.5</span></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>)</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>graph</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; IGRAPH 889e6ff UNW- 2110 3721 -- </span></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; + attr: name (v/c), weight (e/n), avg_time_delta (e/n), n_content_id</span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; | (e/n), n_content_id_y (e/n), edge_symmetry_score (e/n),</span></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; | weight_threshold (e/n)</span></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; + edges from 889e6ff (vertex names):</span></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; [1] 0fb4232d1b7b37069c13ee17579bd10e--d9fe8e4d34b6dcfba8cbcf1be4b28717</span></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; [2] 0fb4232d1b7b37069c13ee17579bd10e--94b2413eb4e850246c07ba1bd55625c2</span></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; [3] 94b2413eb4e850246c07ba1bd55625c2--d9fe8e4d34b6dcfba8cbcf1be4b28717</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; [4] 47a750359d66201ddefe7f7efbfed0b9--7289281c087ccc0342d96604243d0069</span></span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; [5] 6c051ab25467ae690fb24cd2c6c3ad99--7289281c087ccc0342d96604243d0069</span></span>
-<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; [6] 3dced626839250a9c9bf41a381234214--f442b084eb6be4c7f66dffa386c01e4b</span></span>
-<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; + ... omitted several edges</span></span></code></pre></div>
+<code>generate_coordinated_network()</code>. By default, the function
+returns the graph filtered by the median edge weight
+(<code>edge_weight = 0.5</code>, <code>subgraph = 1</code>). This is the
+conventional coordinated-sharing network of accounts connected by
+repeated sharing (e.g., <span class="citation">Giglietto et al.
+(2020)</span>); the edge-weight threshold can be adjusted. To return the
+full graph instead, set <code>subgraph = 0</code>; its
+<code>weight_threshold</code> edge attribute is 0 if an edge does not
+exceed the threshold and 1 otherwise.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>graph <span class="ot">&lt;-</span> <span class="fu">generate_coordinated_network</span>(result)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>graph</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; IGRAPH 704b64c UNW- 94 60 -- </span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; + attr: name (v/c), weight (e/n), avg_time_delta (e/n), n_content_id</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; | (e/n), n_content_id_y (e/n), edge_symmetry_score (e/n),</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; | weight_threshold (e/n)</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; + edges from 704b64c (vertex names):</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; [1] 129b936e6bb06defdd2d41331d9e5d0e--a75cc8452d4f73bd2c9096a641ffa97e</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; [2] 23303497264ceeee35265a7ddc6f2221--a66b033469b405a53adf6eafd4ed0f43</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; [3] 572f3f02cfe0fa8ea0bce4daee92da74--f3e2f918e96d18c70b9a55bffba81b3f</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; [4] 23303497264ceeee35265a7ddc6f2221--e7c63206a504dd0565d1055e65dde548</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; [5] 8fa271d51bacc2baca543d012dc1afe1--93699703a9664d74c290406babef8a8b</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; [6] 371fe944976cd0125c36872bf2900cb4--9e9172bcac37f28bf6eb3b45faecf2df</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; + ... omitted several edges</span></span></code></pre></div>
 </div>
 </div>
 <div id="advanced-usage" class="section level2">
 <h2>Advanced Usage</h2>
 <div id="multi-modal-and-multi-platform-analysis" class="section level3">
 <h3>Multi-Modal and Multi-Platform Analysis</h3>
-<p>To analyze multiple types of content (e.g., URLs, hashtags), run
+<p>To analyze multiple types of content (e.g., URLs and images), run
 <code>detect_groups()</code> separately for each type and combine the
 results.</p>
-<p>We provide an anonymized sample from the authentic dataset by <span class="citation">Righetti et al. (2022)</span> that showcases
-coordinated behavior during the German federal elections in 2021.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Example datasets for different content types</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">head</span>(german_elections)</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; # A data frame: 6 × 7</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt;   account_id post_id url_id hashtag_id domain_id phash_id  timestamp</span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; * &lt;chr&gt;        &lt;int&gt;  &lt;int&gt;      &lt;int&gt;     &lt;int&gt;    &lt;int&gt;      &lt;dbl&gt;</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; 1 fb_12670    129235  23678         NA      3498       NA 1629589836</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; 2 fb_5966      84441     NA         NA      6756       NA 1629589069</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; 3 fb_5966      84443  29871         NA      5534       NA 1629589050</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; 4 fb_5966      84445     NA         NA        NA     9280 1629589022</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; 5 fb_5966      84446  30435         NA      5639       NA 1629589009</span></span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; 6 fb_9045     104337  13609         NA      5804       NA 1629588823</span></span></code></pre></div>
+<p><code>german_elections_sample</code> is included in the installed
+package. It contains 97,413 anonymized rows from 15 August through 7
+September 2021 (UTC), drawn from the data used by <span class="citation"><span class="nocase">Righetti et al.</span>
+(2022)</span>. It includes Facebook and Twitter posts and illustrates
+both URL and image coordination. It is a temporal excerpt for learning,
+not a representative sample or the full study dataset, and cannot
+reproduce the paper’s figures.</p>
+<p>The full anonymized <code>german_elections</code> dataset is
+<strong>not installed with the package</strong>. It is available in the
+<a href="https://github.com/nicolarighetti/CooRTweet">CooRTweet source
+repository</a> at <code>data-raw/german_elections_full.rda</code>. From
+the root of a source checkout,
+<code>load(&quot;data-raw/german_elections_full.rda&quot;)</code> creates the
+<code>german_elections</code> object. The paper reproduction script is
+at <code>vignettes/reproduce_examples.Rmd</code> in that checkout; it is
+not an installed package vignette. Some panels require non-public data
+and are commented out in the public script.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Example datasets for different content types</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">head</span>(german_elections_sample)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt; # A data frame: 6 × 7</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt;   account_id post_id url_id hashtag_id domain_id phash_id  timestamp</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; * &lt;chr&gt;        &lt;int&gt;  &lt;int&gt;      &lt;int&gt;     &lt;int&gt;    &lt;int&gt;      &lt;dbl&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; 1 fb_12670    129235  23678         NA      3498       NA 1629589836</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; 2 fb_5966      84441     NA         NA      6756       NA 1629589069</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; 3 fb_5966      84443  29871         NA      5534       NA 1629589050</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; 4 fb_5966      84445     NA         NA        NA     9280 1629589022</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; 5 fb_5966      84446  30435         NA      5639       NA 1629589009</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; 6 fb_9045     104337  13609         NA      5804       NA 1629588823</span></span></code></pre></div>
 <p>First we prepare shared URLs:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># URLs</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>urls_data <span class="ot">&lt;-</span> <span class="fu">prep_data</span>(german_elections,</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>                       <span class="at">object_id =</span> <span class="st">&quot;url_id&quot;</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>                       <span class="at">account_id =</span> <span class="st">&quot;account_id&quot;</span>,</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>                       <span class="at">content_id =</span> <span class="st">&quot;post_id&quot;</span>,</span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>                       <span class="at">timestamp_share =</span> <span class="st">&quot;timestamp&quot;</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>urls_data <span class="ot">&lt;-</span> <span class="fu">unique</span>(urls_data,</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>                    <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;object_id&quot;</span>, <span class="st">&quot;account_id&quot;</span>, <span class="st">&quot;content_id&quot;</span>, <span class="st">&quot;timestamp_share&quot;</span>))</span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>urls_data <span class="ot">&lt;-</span> urls_data[<span class="sc">!</span><span class="fu">is.na</span>(object_id)]</span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a></span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>urls_data<span class="sc">$</span>object_id <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;url_&quot;</span>, urls_data<span class="sc">$</span>object_id)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># URLs</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>urls_data <span class="ot">&lt;-</span> <span class="fu">prep_data</span>(german_elections_sample,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>                       <span class="at">object_id =</span> <span class="st">&quot;url_id&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>                       <span class="at">account_id =</span> <span class="st">&quot;account_id&quot;</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>                       <span class="at">content_id =</span> <span class="st">&quot;post_id&quot;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>                       <span class="at">timestamp_share =</span> <span class="st">&quot;timestamp&quot;</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>urls_data<span class="sc">$</span>object_id <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;url_&quot;</span>, urls_data<span class="sc">$</span>object_id)</span></code></pre></div>
 <p>Next, we prepare images. We used the <a href="https://en.wikipedia.org/wiki/Perceptual_hashing">pHash
 algorithm</a> to uniquely identify images. The algorithm is implemented
 in the <code>OpenImageR</code> package <span class="citation">(Mouselimis 2023)</span>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># images (pHash)</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>img_data <span class="ot">&lt;-</span> <span class="fu">prep_data</span>(german_elections,</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>                      <span class="at">object_id =</span> <span class="st">&quot;phash_id&quot;</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>                      <span class="at">account_id =</span> <span class="st">&quot;account_id&quot;</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>                      <span class="at">content_id =</span> <span class="st">&quot;post_id&quot;</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>                      <span class="at">timestamp_share =</span> <span class="st">&quot;timestamp&quot;</span>)</span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>img_data <span class="ot">&lt;-</span> <span class="fu">unique</span>(img_data,</span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>                   <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;object_id&quot;</span>, <span class="st">&quot;account_id&quot;</span>, <span class="st">&quot;content_id&quot;</span>, <span class="st">&quot;timestamp_share&quot;</span>))</span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>img_data <span class="ot">&lt;-</span> img_data[<span class="sc">!</span><span class="fu">is.na</span>(object_id)]</span>
-<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a></span>
-<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>img_data<span class="sc">$</span>object_id <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;hash_&quot;</span>, img_data<span class="sc">$</span>object_id)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># images (pHash)</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>img_data <span class="ot">&lt;-</span> <span class="fu">prep_data</span>(german_elections_sample,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>                      <span class="at">object_id =</span> <span class="st">&quot;phash_id&quot;</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>                      <span class="at">account_id =</span> <span class="st">&quot;account_id&quot;</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>                      <span class="at">content_id =</span> <span class="st">&quot;post_id&quot;</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>                      <span class="at">timestamp_share =</span> <span class="st">&quot;timestamp&quot;</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>img_data<span class="sc">$</span>object_id <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;hash_&quot;</span>, img_data<span class="sc">$</span>object_id)</span></code></pre></div>
 <p>Next, we perform the first step of coordination detection on each
 subset of the data with the <code>detect_groups</code> function:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Detect coordinated groups for URLs and hashtags  --------------------</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>result_urls <span class="ot">&lt;-</span> <span class="fu">detect_groups</span>(urls_data, <span class="at">time_window =</span> <span class="dv">30</span>,</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>                             <span class="at">min_participation =</span> <span class="dv">2</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>result_images <span class="ot">&lt;-</span> <span class="fu">detect_groups</span>(img_data, <span class="at">time_window =</span> <span class="dv">30</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>                               <span class="at">min_participation =</span> <span class="dv">2</span>)</span></code></pre></div>
-<p>Then we can simply stack both resulting <code>data.tables</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Combine results  --------------------</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>combined_results <span class="ot">&lt;-</span> <span class="fu">rbindlist</span>( </span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>    <span class="fu">list</span>(result_urls, result_images),</span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>    <span class="at">use.names =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>    <span class="at">fill =</span> <span class="cn">TRUE</span></span>
-<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>)</span></code></pre></div>
-<p>Now we can let the network analysis run with the default settings to
-find accounts that show coordinated behavior in terms of image and URL
-sharing:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Generate the coordinated multi-modal network  --------------------</span></span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>graph <span class="ot">&lt;-</span> <span class="fu">generate_coordinated_network</span>(combined_results, <span class="at">edge_weight =</span> <span class="fl">0.5</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>graph</span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">#&gt; IGRAPH d99b317 UNW- 671 1732 -- </span></span>
-<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt; + attr: name (v/c), weight (e/n), avg_time_delta (e/n), n_content_id</span></span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt; | (e/n), n_content_id_y (e/n), edge_symmetry_score (e/n),</span></span>
-<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt; | weight_threshold (e/n)</span></span>
-<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#&gt; + edges from d99b317 (vertex names):</span></span>
-<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt;  [1] fb_5761 --fb_7103  fb_12065--fb_4039  fb_11199--fb_3297  fb_11202--fb_18649</span></span>
-<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt;  [5] fb_2258 --fb_4039  fb_21069--fb_9754  fb_11202--fb_21069 fb_11202--fb_4039 </span></span>
-<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt;  [9] fb_11202--fb_9754  fb_21069--fb_18649 fb_18649--fb_4039  fb_14401--fb_8707 </span></span>
-<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co">#&gt; [13] fb_18649--fb_9754  fb_4039 --fb_7548  fb_12670--fb_17402 fb_4039 --fb_8027 </span></span>
-<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">#&gt; [17] fb_17402--fb_8027  fb_4039 --fb_8900  fb_8027 --fb_8900  fb_17402--fb_8900 </span></span>
-<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a><span class="co">#&gt; [21] fb_17326--fb_7548  fb_17326--fb_3732  fb_3732 --fb_7548  fb_17326--fb_20736</span></span>
-<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a><span class="co">#&gt; + ... omitted several edges</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Detect coordinated groups for URLs and images  --------------------</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>result_urls <span class="ot">&lt;-</span> <span class="fu">detect_groups</span>(urls_data, <span class="at">time_window =</span> <span class="dv">30</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>                             <span class="at">min_participation =</span> <span class="dv">2</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>result_images <span class="ot">&lt;-</span> <span class="fu">detect_groups</span>(img_data, <span class="at">time_window =</span> <span class="dv">30</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>                               <span class="at">min_participation =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p>To study only URL shares 10 to 30 seconds apart, we can make a
+separate call. Both 10 and 30 seconds are included:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>result_urls_10_30 <span class="ot">&lt;-</span> <span class="fu">detect_groups</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  urls_data, <span class="at">time_window =</span> <span class="dv">30</span>, <span class="at">time_window_low =</span> <span class="dv">10</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">min_participation =</span> <span class="dv">2</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>)</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="fu">head</span>(result_urls_10_30)</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt;    object_id content_id content_id_y time_delta account_id account_id_y</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt;       &lt;char&gt;     &lt;char&gt;       &lt;char&gt;      &lt;num&gt;     &lt;char&gt;       &lt;char&gt;</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#&gt; 1: url_10813      93413        81826         30    fb_7103      fb_5761</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt; 2: url_21770      54564       123648         28    fb_4039     fb_12065</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt; 3: url_21770     117955        45559         11   fb_11199      fb_3297</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; 4: url_14583     179086       117972         15   fb_18649     fb_11202</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co">#&gt; 5: url_14583      36588        54562         18    fb_2258      fb_4039</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">#&gt; 6: url_30435     204242       108918         21   fb_21069      fb_9754</span></span></code></pre></div>
+<p>Then we can simply stack the original URL and image results:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># Combine results  --------------------</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>combined_results <span class="ot">&lt;-</span> <span class="fu">rbindlist</span>( </span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>    <span class="fu">list</span>(result_urls, result_images),</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>    <span class="at">use.names =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>    <span class="at">fill =</span> <span class="cn">TRUE</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>)</span></code></pre></div>
+<p>Now we can generate a filtered network with <code>subgraph = 1</code>
+(also the current default) to find accounts that show coordinated
+behavior in terms of image and URL sharing. The input includes both
+platforms, but the filtered graph in this example has no
+Facebook–Twitter edges; including two platforms does not itself
+establish cross-platform coordination.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Generate the coordinated multi-modal network  --------------------</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>graph <span class="ot">&lt;-</span> <span class="fu">generate_coordinated_network</span>(combined_results, <span class="at">subgraph =</span> <span class="dv">1</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>graph</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; IGRAPH 8a8ef1a UNW- 167 231 -- </span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; + attr: name (v/c), weight (e/n), avg_time_delta (e/n), n_content_id</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; | (e/n), n_content_id_y (e/n), edge_symmetry_score (e/n),</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; | weight_threshold (e/n)</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt; + edges from 8a8ef1a (vertex names):</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#&gt;  [1] fb_5761 --fb_7103  fb_12065--fb_4039  fb_11199--fb_3297  fb_2258 --fb_4039 </span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt;  [5] fb_21069--fb_9754  fb_18649--fb_4039  fb_4039 --fb_7548  fb_12670--fb_17402</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt;  [9] fb_10893--fb_14704 fb_13917--fb_6467  fb_16134--fb_9754  fb_4039 --fb_16062</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt; [13] fb_12670--fb_7103  fb_7548 --fb_17635 fb_14704--fb_17694 fb_17326--fb_16062</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt; [17] fb_21582--fb_6019  fb_4550 --fb_6019  fb_21582--fb_4550  fb_18649--fb_7548 </span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt; [21] fb_17966--fb_18029 fb_16865--fb_18029 fb_17966--fb_16865 fb_10893--fb_15306</span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="co">#&gt; + ... omitted several edges</span></span></code></pre></div>
 </div>
 <div id="visualization" class="section level3">
 <h3>Visualization</h3>
 <p>Visualize the coordination network using <code>igraph</code>:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="fu">plot.igraph</span>(</span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>    graph,</span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>    <span class="at">layout =</span> layout.fruchterman.reingold,</span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>    <span class="at">edge.width =</span> <span class="fl">0.5</span>,</span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>    <span class="at">edge.curved =</span> <span class="fl">0.3</span>,</span>
-<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>    <span class="at">vertex.size =</span> <span class="dv">3</span>,</span>
-<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>    <span class="at">vertex.frame.color =</span> <span class="st">&quot;grey&quot;</span>,</span>
-<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>    <span class="at">vertex.frame.width =</span> <span class="fl">0.1</span>,</span>
-<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>    <span class="at">vertex.label =</span> <span class="cn">NA</span></span>
-<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">plot.igraph</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>    graph,</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>    <span class="at">layout =</span> layout.fruchterman.reingold,</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>    <span class="at">edge.width =</span> <span class="fl">0.5</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>    <span class="at">edge.curved =</span> <span class="fl">0.3</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>    <span class="at">vertex.size =</span> <span class="dv">3</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>    <span class="at">vertex.frame.color =</span> <span class="st">&quot;grey&quot;</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>    <span class="at">vertex.frame.width =</span> <span class="fl">0.1</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a>    <span class="at">vertex.label =</span> <span class="cn">NA</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 </div>
 <div id="additional-features" class="section level2">
@@ -615,25 +673,52 @@ coordinated behaviors with a high degree of flexibility and precision.
 Its generalized architecture makes it adaptable to various contexts and
 datasets, empowering social media research and analysis.</p>
 </div>
+<div id="coordinated-sharing-detection-service-powered-by-coortweet" class="section level2">
+<h2>Coordinated Sharing Detection Service powered by CooRTweet</h2>
+<p>CooRTweet also powers the <a href="https://coortweet.lab.atc.gr/">Coordinated Sharing Detection
+Service</a>, a web-based service built on a streamlined version of the R
+package. It enables data journalists, fact-checkers, researchers, and
+other practitioners to analyze and visualize patterns of coordinated
+sharing in social media data.</p>
+</div>
+<div id="acknowledgments" class="section level2">
+<h2>Acknowledgments</h2>
+<p>This work was partially supported by the vera.ai project, funded by
+the European Union through the Horizon Europe program (Grant Agreement
+ID 101070093).</p>
+</div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Giglietto2020" class="csl-entry">
+Giglietto, Fabio, Nicola Righetti, Luca Rossi, and Giada Marino. 2020.
+<span>“It Takes a Village to Manipulate the Media: Coordinated Link
+Sharing Behavior During 2018 and 2019 Italian Elections.”</span>
+<em>Information, Communication &amp; Society</em> 23 (6): 867–91. <a href="https://doi.org/10.1080/1369118X.2020.1739732">https://doi.org/10.1080/1369118X.2020.1739732</a>.
+</div>
 <div id="ref-Kulichkina2024" class="csl-entry">
 Kulichkina, Aytalina, Nicola Righetti, and Annie Waldherr. 2024.
 <span>“Protest and Repression on Social Media: Pro-Navalny and
 Pro-Government Mobilization Dynamics and Coordination Patterns on
-Russian Twitter.”</span> <em>New Media &amp; Society</em>. <a href="https://doi.org/10.1177/14614448241254126">https://doi.org/10.1177/14614448241254126</a>.
+Russian Twitter.”</span> <em>New Media &amp; Society</em>, ahead of
+print. <a href="https://doi.org/10.1177/14614448241254126">https://doi.org/10.1177/14614448241254126</a>.
 </div>
 <div id="ref-OpenImageR" class="csl-entry">
 Mouselimis, Lampros. 2023. <em><span>OpenImageR</span>: An Image
 Processing Toolkit</em>. <a href="https://CRAN.R-project.org/package=OpenImageR">https://CRAN.R-project.org/package=OpenImageR</a>.
 </div>
+<div id="ref-Righetti2025" class="csl-entry">
+Righetti, Nicola, and Paul Balluff. 2025. <span>“<span>CooRTweet</span>:
+A Generalized <span>R</span> Software for Coordinated Network
+Detection.”</span> <em>Computational Communication Research</em> 7 (1):
+1. <a href="https://doi.org/10.5117/CCR2025.1.7.RIGH">https://doi.org/10.5117/CCR2025.1.7.RIGH</a>.
+</div>
 <div id="ref-Righetti2022" class="csl-entry">
-Righetti, Nicola, Fabio Giglietto, Azade Esther Kakavand, Aytalina
-Kulichkina, Giada Marino, Massimo Terenzi, et al. 2022. <span>“Political
-Advertisement and Coordinated Behavior on Social Media in the Lead-up to
-the 2021 German Federal Elections.”</span> <em>Dusseldorf: Media
-Authority of North Rhine-Westphalia</em>.
+<span class="nocase">Righetti, Nicola, Fabio Giglietto, Azade Esther
+Kakavand, et al.</span> 2022. <span>“Political Advertisement and
+Coordinated Behavior on Social Media in the Lead-up to the 2021 German
+Federal Elections.”</span> <em>Dusseldorf: Media Authority of North
+Rhine-Westphalia</em>.
 </div>
 </div>
 </div>

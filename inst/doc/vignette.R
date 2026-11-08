@@ -10,7 +10,7 @@ library(CooRTweet)
 # install.packages("CooRTweet")
 # 
 # # Or install the development version from GitHub
-# devtools::install_github("username/CooRTweet") # Replace with actual GitHub repository
+# devtools::install_github("nicolarighetti/CooRTweet")
 
 ## ----data-preparation---------------------------------------------------------
 library(CooRTweet)
@@ -24,55 +24,63 @@ result <- detect_groups(
 )
 head(result)
 
-## ----generate-network---------------------------------------------------------
-graph <- generate_coordinated_network(
-  result,
-  edge_weight = 0.5
+## ----inclusive-time-interval--------------------------------------------------
+shares <- data.table::data.table(
+  object_id = "url_1",
+  account_id = c("A", "B", "C"),
+  content_id = c("p1", "p2", "p3"),
+  timestamp_share = c(0, 10, 30)
 )
+
+interval_result <- detect_groups(
+  shares, time_window = 20, time_window_low = 10,
+  min_participation = 1
+)
+sort(interval_result$time_delta)
+
+## ----generate-network---------------------------------------------------------
+graph <- generate_coordinated_network(result)
 graph
 
 ## ----german-elections---------------------------------------------------------
 # Example datasets for different content types
-head(german_elections)
+head(german_elections_sample)
 
 ## ----multimodal-urls----------------------------------------------------------
 # URLs
-urls_data <- prep_data(german_elections,
+urls_data <- prep_data(german_elections_sample,
                        object_id = "url_id",
                        account_id = "account_id",
                        content_id = "post_id",
                        timestamp_share = "timestamp")
 
-urls_data <- unique(urls_data,
-                    by = c("object_id", "account_id", "content_id", "timestamp_share"))
-
-urls_data <- urls_data[!is.na(object_id)]
-
 urls_data$object_id <- paste0("url_", urls_data$object_id)
 
 ## ----multimodal-images--------------------------------------------------------
 # images (pHash)
-img_data <- prep_data(german_elections,
+img_data <- prep_data(german_elections_sample,
                       object_id = "phash_id",
                       account_id = "account_id",
                       content_id = "post_id",
                       timestamp_share = "timestamp")
 
-img_data <- unique(img_data,
-                   by = c("object_id", "account_id", "content_id", "timestamp_share"))
-
-img_data <- img_data[!is.na(object_id)]
-
 img_data$object_id <- paste0("hash_", img_data$object_id)
 
 ## ----multimodal-detect groups-------------------------------------------------
-# Detect coordinated groups for URLs and hashtags  --------------------
+# Detect coordinated groups for URLs and images  --------------------
 result_urls <- detect_groups(urls_data, time_window = 30,
                              min_participation = 2)
 
 result_images <- detect_groups(img_data, time_window = 30,
                                min_participation = 2)
 
+
+## ----url-time-interval--------------------------------------------------------
+result_urls_10_30 <- detect_groups(
+  urls_data, time_window = 30, time_window_low = 10,
+  min_participation = 2
+)
+head(result_urls_10_30)
 
 ## ----multimodal-stack---------------------------------------------------------
 # Combine results  --------------------
@@ -86,7 +94,7 @@ combined_results <- rbindlist(
 
 ## ----multimodal-generate-network----------------------------------------------
 # Generate the coordinated multi-modal network  --------------------
-graph <- generate_coordinated_network(combined_results, edge_weight = 0.5)
+graph <- generate_coordinated_network(combined_results, subgraph = 1)
 graph
 
 ## ----visualize-network, eval = FALSE------------------------------------------
